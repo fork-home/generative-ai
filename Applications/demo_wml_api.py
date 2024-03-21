@@ -9,7 +9,7 @@ This example shows simple use cases without comprehensive prompt tuning
 """
 
 # Install the wml api your Python env prior to running this example:
-# pip install ibm-watson-machine-learning
+# pip install ibm-watsonx-ai
 # pip install ibm-cloud-sdk-core
 
 # In non-Anaconda Python environments, you may also need to install dotenv
@@ -19,26 +19,19 @@ This example shows simple use cases without comprehensive prompt tuning
 import os
 from dotenv import load_dotenv
 
-# WML python SDK
-from ibm_watson_machine_learning.foundation_models import Model
-from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenParams
-from ibm_watson_machine_learning.foundation_models.utils.enums import ModelTypes, DecodingMethods
+# watsonx.ai python SDK
+from ibm_watsonx_ai.foundation_models import Model
+from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
+from ibm_watsonx_ai.foundation_models.utils.enums import ModelTypes, DecodingMethods
 
 # For invocation of LLM with REST API
 import requests, json
 from ibm_cloud_sdk_core import IAMTokenManager
 
-# Important: hardcoding the API key in Python code is not a best practice. We are using
-# this approach for the ease of demo setup. In a production application these variables
-# can be stored in an .env or a properties file
-
-# URL of the hosted LLMs is hardcoded because at this time all LLMs share the same endpoint
-url = "https://us-south.ml.cloud.ibm.com"
-
 # These global variables will be updated in get_credentials() functions
 watsonx_project_id = ""
-# Replace with your IBM Cloud key
 api_key = ""
+url = ""
 
 def get_credentials():
 
@@ -47,15 +40,17 @@ def get_credentials():
     # Update the global variables that will be used for authentication in another function
     globals()["api_key"] = os.getenv("api_key", None)
     globals()["watsonx_project_id"] = os.getenv("project_id", None)
+    globals()["url"] = os.getenv("url", None)
 
 # The get_model function creates an LLM model object with the specified parameters
-def get_model(model_type,max_tokens,min_tokens,decoding,temperature):
+def get_model(model_type,max_tokens,min_tokens,decoding,temperature,stop_sequences):
 
     generate_params = {
         GenParams.MAX_NEW_TOKENS: max_tokens,
         GenParams.MIN_NEW_TOKENS: min_tokens,
         GenParams.DECODING_METHOD: decoding,
-        GenParams.TEMPERATURE: temperature
+        GenParams.TEMPERATURE: temperature,
+        GenParams.STOP_SEQUENCES:stop_sequences
     }
 
     model = Model(
@@ -80,15 +75,16 @@ def get_list_of_complaints():
     # If you want the end user to have a choice of the number of tokens in the output as well as decoding
     # and temperature, you can parameterize these values
 
-    model_type = ModelTypes.MPT_7B_INSTRUCT2
+    model_type = ModelTypes.LLAMA_2_70B_CHAT
     max_tokens = 100
     min_tokens = 50
     decoding = DecodingMethods.GREEDY
     # Temperature will be ignored if GREEDY is used
     temperature = 0.7
+    stop_sequences = ['.']
 
     # Instantiate the model
-    model = get_model(model_type,max_tokens,min_tokens,decoding, temperature)
+    model = get_model(model_type,max_tokens,min_tokens,decoding, temperature,stop_sequences)
 
     complaint = f"""
             I just tried to book a flight on your incredibly slow website.  All 
@@ -137,9 +133,10 @@ def answer_questions():
     min_tokens = 50
     decoding = DecodingMethods.SAMPLE
     temperature = 0.7
+    stop_sequences = ['.']
 
     # Instantiate the model
-    model = get_model(model_type,max_tokens,min_tokens,decoding, temperature)
+    model = get_model(model_type,max_tokens,min_tokens,decoding, temperature,stop_sequences)
     # Invoke the model and print the results
     generated_response = model.generate(prompt=final_prompt)
     # WML API returns a dictionary object. Generated response is a list object that contains generated text
@@ -152,7 +149,7 @@ def answer_questions():
 
 def invoke_with_REST():
 
-    rest_url ="https://us-south.ml.cloud.ibm.com/ml/v1-beta/generation/text?version=2023-05-29"
+    rest_url =url + "/ml/v1/text/generation?version=2023-05-29"
 
     access_token = get_auth_token()
 
