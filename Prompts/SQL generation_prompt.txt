@@ -1,6 +1,6 @@
 SQL generation Prompt
 
-Try these prompts with starcoder, max tokens - 300
+Try these prompts with mixtral-8x-7b, max tokens - 300
 
 
 Prompt 1
