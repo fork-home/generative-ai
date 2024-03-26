@@ -57,7 +57,7 @@ def invoke_prompt(access_token):
     data = {
         "parameters": {
             "prompt_variables": {
-                "input": "The insured vehicle, a Tesla model X, was vandalized on March 23rd while parked in front of the insured residence on Magador Street. The vandalism included scratched paint, broken windows, and damage to the side mirrors. The insured promptly reported the incident to the police and obtained a police report. The insured is filing a claim for the repairs and any necessary replacement parts. The estimated cost of repairs has been assessed by a reputable auto repair shop."
+                "claim_desc": "The insured vehicle, a Tesla model X, was vandalized on March 23rd while parked in front of the insured residence on Magador Street. The vandalism included scratched paint, broken windows, and damage to the side mirrors. The insured promptly reported the incident to the police and obtained a police report. The insured is filing a claim for the repairs and any necessary replacement parts. The estimated cost of repairs has been assessed by a reputable auto repair shop."
             }
         }
     }
